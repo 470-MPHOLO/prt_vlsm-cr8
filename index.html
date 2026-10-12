@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Cre8Learn Institute: Routing Protocols and VLSM Portal</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #eef1ec;
+    --surface: #ffffff;
+    --surface-2: #f4f7f1;
+    --border: #d3dbcf;
+    --accent: #2f6fb5;
+    --accent-dim: #4f8cd0;
+    --gold: #b08d1e;
+    --green: #2d8a4a;
+    --red: #c0392b;
+    --text: #1a1a1a;
+    --text-dim: #555555;
+    --mono: "Courier New", Courier, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  .topbar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    flex-wrap: wrap;
+    gap: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  .brand {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .brand .inst {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-family: var(--mono);
+    width: 100%;
+    margin-bottom: -4px;
+    font-weight: bold;
+  }
+  .brand .name {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.3px;
+  }
+  .brand .sub {
+    font-size: 12px;
+    color: var(--text-dim);
+  }
+  .tabs {
+    display: flex;
+    gap: 6px;
+    background: var(--surface-2);
+    border-radius: 8px;
+    padding: 4px;
+    border: 1px solid var(--border);
+  }
+  .tab {
+    background: transparent;
+    border: none;
+    color: var(--text-dim);
+    padding: 9px 20px;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    font-weight: 500;
+  }
+  .tab:hover { color: var(--text); }
+  .tab.active {
+    background: var(--accent);
+    color: #fff;
+    font-weight: 600;
+  }
+
+  .container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 28px 24px 80px;
+  }
+  .view { display: none; }
+  .view.active { display: block; }
+
+  .portal-intro {
+    background: linear-gradient(135deg, #f4f8f2 0%, #ffffff 100%);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px 30px;
+    margin-bottom: 26px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+  }
+  .portal-intro .inst-tag {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 8px;
+    display: block;
+    font-weight: bold;
+  }
+  .portal-intro h1 {
+    font-size: 24px;
+    margin-bottom: 6px;
+    color: var(--text);
+  }
+  .portal-intro p {
+    color: var(--text-dim);
+    font-size: 14px;
+    max-width: 720px;
+  }
+
+  .section-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 18px;
+    overflow: hidden;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+  }
+  .section-header {
+    padding: 18px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  .section-header .label {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--gold);
+    display: block;
+    margin-bottom: 3px;
+    font-weight: bold;
+  }
+  .section-header h3 {
+    font-size: 16px;
+    color: var(--text);
+    font-weight: 600;
+  }
+  .section-header .toggle {
+    color: var(--accent);
+    font-size: 20px;
+    transition: transform 0.25s;
+    flex-shrink: 0;
+  }
+  .section-card.open .toggle { transform: rotate(45deg); }
+
+  .section-body {
+    display: none;
+    padding: 4px 24px 22px;
+    border-top: 1px solid var(--border);
+  }
+  .section-card.open .section-body { display: block; }
+
+  .topic {
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .topic:last-child { border-bottom: none; }
+  .topic h4 {
+    font-size: 14.5px;
+    color: var(--accent);
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+  .topic p, .topic li {
+    font-size: 13.5px;
+    color: var(--text-dim);
+    margin-bottom: 4px;
+  }
+  .topic ul {
+    padding-left: 20px;
+    margin-top: 4px;
+  }
+  .topic strong { color: var(--text); }
+  .topic code {
+    font-family: var(--mono);
+    background: var(--surface-2);
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-size: 12.5px;
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+  .topic .formula {
+    font-family: var(--mono);
+    font-size: 12.5px;
+    background: var(--surface-2);
+    padding: 10px 14px;
+    border-left: 3px solid var(--gold);
+    border-radius: 0 4px 4px 0;
+    color: var(--text);
+    margin: 8px 0;
+    line-height: 1.7;
+  }
+  .topic table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 8px 0;
+    font-size: 13px;
+  }
+  .topic table th, .topic table td {
+    text-align: left;
+    padding: 6px 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  .topic table th {
+    background: var(--surface-2);
+    font-weight: 600;
+    color: var(--text);
+  }
+  .topic table td { color: var(--text-dim); }
+
+  .quiz-intro {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 26px 30px;
+    margin-bottom: 22px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+  }
+  .quiz-intro .inst-tag {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 10px;
+    display: block;
+    font-weight: bold;
+  }
+  .quiz-intro h2 {
+    font-size: 20px;
+    margin-bottom: 6px;
+  }
+  .quiz-intro p {
+    color: var(--text-dim);
+    font-size: 13.5px;
+    margin-bottom: 16px;
+  }
+  .quiz-intro .start-btn {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    padding: 13px 34px;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.1s, box-shadow 0.15s;
+  }
+  .quiz-intro .start-btn:hover {
+    background: #3a7fc5;
+    box-shadow: 0 0 20px rgba(47, 111, 181, 0.25);
+  }
+  .quiz-intro .start-btn:active { transform: scale(0.98); }
+
+  .q-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 22px 26px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+  }
+  .q-card .meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .q-card .qnum {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--gold);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-weight: bold;
+  }
+  .q-card .topic-tag {
+    font-size: 10px;
+    background: var(--surface-2);
+    color: var(--text-dim);
+    padding: 2px 10px;
+    border-radius: 10px;
+    letter-spacing: 0.5px;
+    border: 1px solid var(--border);
+  }
+  .q-card .qtext {
+    font-size: 15px;
+    color: var(--text);
+    margin-bottom: 16px;
+    font-weight: 500;
+    line-height: 1.55;
+  }
+  .q-options {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+  }
+  .q-option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 16px;
+    background: var(--surface-2);
+    border: 1px solid transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13.5px;
+    color: var(--text-dim);
+    transition: border-color 0.15s, background 0.15s, color 0.15s;
+  }
+  .q-option:hover {
+    background: #eaf2fb;
+    color: var(--text);
+    border-color: var(--accent-dim);
+  }
+  .q-option .letter {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--border);
+    color: var(--text-dim);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .q-option.selected {
+    border-color: var(--accent);
+    background: rgba(47, 111, 181, 0.08);
+    color: var(--text);
+  }
+  .q-option.selected .letter {
+    background: var(--accent);
+    color: #fff;
+  }
+  .q-option.correct {
+    border-color: var(--green);
+    background: rgba(45, 138, 74, 0.1);
+    color: var(--text);
+  }
+  .q-option.correct .letter {
+    background: var(--green);
+    color: #fff;
+  }
+  .q-option.wrong {
+    border-color: var(--red);
+    background: rgba(192, 57, 43, 0.08);
+    color: var(--text);
+  }
+  .q-option.wrong .letter {
+    background: var(--red);
+    color: #fff;
+  }
+
+  .quiz-controls {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-top: 26px;
+    flex-wrap: wrap;
+  }
+  .btn {
+    font-family: inherit;
+    font-size: 13.5px;
+    padding: 11px 26px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: opacity 0.15s, background 0.15s;
+    border: 1px solid transparent;
+  }
+  .btn:hover { opacity: 0.88; }
+  .btn.primary {
+    background: var(--accent);
+    color: #fff;
+  }
+  .btn.ghost {
+    background: transparent;
+    border-color: var(--border);
+    color: var(--text-dim);
+  }
+  .btn.ghost:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .score-banner {
+    background: linear-gradient(135deg, #f4f8f2 0%, #ffffff 100%);
+    border: 1px solid var(--accent-dim);
+    border-radius: 12px;
+    padding: 24px;
+    text-align: center;
+    margin-top: 26px;
+    display: none;
+    box-shadow: 0 4px 16px rgba(47, 111, 181, 0.08);
+  }
+  .score-banner.show { display: block; }
+  .score-banner .big {
+    font-size: 40px;
+    color: var(--accent);
+    font-weight: 700;
+    letter-spacing: 1px;
+  }
+  .score-banner .msg {
+    color: var(--text-dim);
+    font-size: 14px;
+    margin-top: 6px;
+  }
+
+  .progress-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+    font-size: 12.5px;
+    color: var(--text-dim);
+    font-family: var(--mono);
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .bar-outer {
+    flex: 1;
+    min-width: 160px;
+    height: 6px;
+    background: var(--surface-2);
+    border-radius: 3px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  .bar-inner {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(to right, var(--accent-dim), var(--accent));
+    transition: width 0.3s;
+  }
+
+  .site-footer {
+    text-align: center;
+    padding: 26px 20px 40px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 0.5px;
+    border-top: 1px solid var(--border);
+    margin-top: 20px;
+  }
+  .site-footer strong { color: var(--gold); }
+
+  @media (max-width: 640px) {
+    .topbar { padding: 12px 16px; }
+    .container { padding: 20px 16px 60px; }
+    .portal-intro, .quiz-intro { padding: 22px 20px; }
+    .q-card { padding: 18px 18px; }
+    .tab { padding: 8px 14px; font-size: 12px; }
+    .topic table { font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">
+    <span class="inst">Cre8Learn Institute</span>
+    <span class="name">Routing Protocols and VLSM</span>
+    <span class="sub">Learning Portal</span>
+  </div>
+  <div class="tabs">
+    <button class="tab active" data-view="study" type="button">Study Portal</button>
+    <button class="tab" data-view="quiz" type="button">Quiz Bank</button>
+  </div>
+</div>
+
+<div class="container">
+
+  <div class="view active" id="view-study">
+    <div class="portal-intro">
+      <span class="inst-tag">Cre8Learn Institute</span>
+      <h1>Routing Protocols and VLSM: Study Portal</h1>
+      <p>Full notes on routing protocols, routing metrics, administrative distance, and Variable Length Subnet Masking. Click any section to open it.</p>
+    </div>
+
+    <div class="section-card open">
+      <div class="section-header">
+        <div>
+          <span class="label">Section 1</span>
+          <h3>Introduction to Routing</h3>
+        </div>
+        <span class="toggle">+</span>
+      </div>
+      <div class="section-body">
+        <div class="topic">
+          <h4>What is Routing?</h4>
+          <p>Routing is the process of selecting a path for traffic in a network. A router examines the destination IP address of each packet and forwards the packet to the next hop on the best path toward that destination.</p>
+          <p>Routing happens at Layer 3 of the OSI model, the Network Layer.</p>
+        </div>
+        <div class="topic">
+          <h4>Static vs Dynamic Routing</h4>
+          <ul>
+            <li><strong>Static routing:</strong> routes are configured manually by an administrator. They do not change unless the administrator changes them.</li>
+            <li><strong>Dynamic routing:</strong> routes are learned automatically from other routers using a routing protocol. Routers exchange information and adapt to changes.</li>
+          </ul>
+        </div>
+        <div class="topic">
+          <h4>Autonomous System (AS)</h4>
+          <p>An Autonomous System is a group of networks under a single administrative control, such as one company or one Internet Service Provider.</p>
+          <ul>
+            <li><strong>Interior Gateway Protocols (IGP):</strong> used inside one AS. Examples: RIP, OSPF, EIGRP, IS-IS.</li>
+            <li><strong>Exterior Gateway Protocols (EGP):</strong> used between different autonomous systems. Example: BGP.</li>
+          </ul>
+        </div>
+        <div class="topic">
+          <h4>Route Selection Order</h4>
+          <p>When a router has multiple routes to the same destination, it chooses in this order:</p>
+          <ul>
+            <li><strong>Longest prefix match:</strong> the most specific route wins, for example /24 beats /16.</li>
+            <li><strong>Lowest administrative distance:</strong> when the prefix length is the same, the protocol with the lowest AD wins.</li>
+            <li><strong>Lowest metric:</strong> when AD is the same, the route with the lowest metric wins.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-header">
+        <div>
+          <span class="label">Section 2</span>
+          <h3>Distance Vector Routing Protocols</h3>
+        </div>
+        <span class="toggle">+</span>
+      </div>
+      <div class="section-body">
+        <div class="topic">
+          <h4>What is a Distance Vector Protocol?</h4>
+          <p>A distance vector protocol shares its entire routing table with its directly connected neighbors at regular intervals. It measures distance as a metric and chooses the path with the smallest distance.</p>
+          <p>The best known example is <strong>RIP</strong>, which uses the Bellman-Ford algorithm.</p>
+        </div>
+        <div class="topic">
+          <h4>RIP: Routing Information Protocol</h4>
+          <ul>
+            <li>Metric is <strong>hop count</strong>.</li>
+            <li>Maximum valid hop count is <strong>15</strong>. A count of <strong>16</strong> means unreachable.</li>
+            <li>RIPv1 is classful and does not carry subnet masks. RIPv2 is classless and supports VLSM and CIDR.</li>
+            <li>Administrative distance is <strong>120</strong>.</li>
+            <li>Uses split horizon, route poisoning, and hold-down timers to prevent loops.</li>
+            <li>Default timers: Update 30 seconds, Invalid 180 seconds, Hold-down 180 seconds, Flush 240 seconds.</li>
+          </ul>
+        </div>
+        <div class="topic">
+          <h4>Problems with Distance Vector Protocols</h4>
+          <ul>
+            <li><strong>Routing loops:</strong> packets bounce between routers.</li>
+            <li><strong>Count to infinity:</strong> the hop count keeps increasing instead of stopping.</li>
+            <li><strong>Slow convergence:</strong> the network takes a long time to agree on a new topology.</li>
+          </ul>
+          <p>Fixes include split horizon, route poisoning, hold-down timers, and triggered updates.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-header">
+        <div>
+          <span class="label">Section 3</span>
+          <h3>Link State Routing Protocols</h3>
+        </div>
+        <span class="toggle">+</span>
+      </div>
+      <div class="section-body">
+        <div class="topic">
+          <h4>What is a Link State Protocol?</h4>
+          <p>A link state protocol builds a complete map of the network topology. Every router knows the state of every link. It uses the Dijkstra Shortest Path First algorithm to calculate the best path.</p>
+          <p>The best known example is <strong>OSPF</strong>.</p>
+        </div>
+        <div class="topic">
+          <h4>OSPF: Open Shortest Path First</h4>
+          <ul>
+            <li>Metric is <strong>cost</strong>, calculated as reference bandwidth divided by interface bandwidth. Default reference is 100 Mbps.</li>
+            <li>Administrative distance is <strong>110</strong>.</li>
+            <li>Open standard, works with any vendor.</li>
+            <li>Supports VLSM and CIDR.</li>
+            <li>Converges very fast using triggered updates and the SPF algorithm.</li>
+            <li>Uses areas to make the network more scalable. Area 0 is the backbone.</li>
+            <li>Default hello timer is 10 seconds and dead timer is 40 seconds on broadcast networks.</li>
+          </ul>
+        </div>
+        <div class="topic">
+          <h4>OSPF LSA Types</h4>
+          <ul>
+            <li><strong>Type 1:</strong> Router LSA. Every router generates one.</li>
+            <li><strong>Type 2:</strong> Network LSA. Generated by the designated router.</li>
+            <li><strong>Type 3:</strong> Summary LSA. Generated by Area Border Routers to share routes between areas.</li>
+            <li><strong>Type 5:</strong> External LSA. Routes redistributed from outside OSPF.</li>
+          </ul>
+        </div>
+        <div class="topic">
+          <h4>OSPF Router Roles</h4>
+          <ul>
+            <li><strong>Internal router:</strong> all interfaces are in one area.</li>
+            <li><strong>Backbone router:</strong> has an interface in area 0.</li>
+            <li><strong>Area Border Router (ABR):</strong> connects two or more areas.</li>
+            <li><strong>Autonomous System Boundary Router (ASBR):</strong> connects OSPF to another routing domain.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-header">
+        <div>
+          <span class="label">Section 4</span>
+          <h3>EIGRP and BGP</h3>
+        </div>
+        <span class="toggle">+</span>
+      </div>
+      <div class="section-body">
+        <div class="topic">
+          <h4>EIGRP: Enhanced Interior Gateway Routing Protocol</h4>
+          <ul>
+            <li>Advanced distance vector, also called hybrid.</li>
+            <li>Cisco proprietary.</li>
+            <li>Metric is a composite of bandwidth, delay, load, and reliability. MTU is used only for path selection.</li>
+            <li>Administrative distance is <strong>90</strong> for internal routes and <strong>170</strong> for external routes.</li>
+            <li>Uses the DUAL algorithm. Very fast convergence.</li>
+            <li>Supports unequal cost load balancing with the variance command.</li>
+            <li>Hello timer is 5 seconds and hold timer is 15 seconds on fast links.</li>
+          </ul>
+        </div>
+        <div class="topic">
+          <h4>BGP: Border Gateway Protocol</h4>
+          <ul>
+            <li>Path vector protocol.</li>
+            <li>Used between autonomous systems on the Internet.</li>
+            <li>Administrative distance is <strong>20</strong> for external BGP and <strong>200</strong> for internal BGP.</li>
+            <li>Uses path attributes such as AS path, local preference, multi exit discriminator (MED), and weight.</li>
+            <li>Prevents loops by checking the AS path. If a router sees its own AS in the path, it rejects the route.</li>
+            <li>Uses TCP port 179 for transport.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-header">
+        <div>
+          <span class="label">Section 5</span>
+          <h3>Administrative Distance and Metrics</h3>
+        </div>
+        <span class="toggle">+</span>
+      </div>
+      <div class="section-body">
+        <div class="topic">
+          <h4>Administrative Distance Table</h4>
+          <table>
+            <thead>
+              <tr><th>Route Source</th><th>Administrative Distance</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Directly connected</td><td>0</td></tr>
+              <tr><td>Static route</td><td>1</td></tr>
+              <tr><td>External BGP</td><td>20</td></tr>
+              <tr><td>EIGRP internal</td><td>90</td></tr>
+              <tr><td>OSPF</td><td>110</td></tr>
+              <tr><td>RIP</td><td>120</td></tr>
+              <tr><td>EIGRP external</td><td>170</td></tr>
+              <tr><td>Internal BGP</td><td>200</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="topic">
+          <h4>Routing Metrics</h4>
+          <table>
+            <thead>
+              <tr><th>Protocol</th><th>Metric</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>RIP</td><td>Hop count (maximum 15)</td></tr>
+              <tr><td>OSPF</td><td>Cost based on bandwidth</td></tr>
+              <tr><td>EIGRP</td><td>Composite: bandwidth and delay by default</td></tr>
+              <tr><td>BGP</td><td>Path attributes</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-header">
+        <div>
+          <span class="label">Section 6</span>
+          <h3>VLSM: Variable Length Subnet Masking</h3>
+        </div>
+        <span class="toggle">+</span>
+      </div>
+      <div class="section-body">
+        <div class="topic">
+          <h4>What is VLSM?</h4>
+          <p>VLSM stands for Variable Length Subnet Masking. It allows a network to be divided into subnets of different sizes. A large subnet can serve a large department while a small subnet serves a point to point link between two routers.</p>
+          <p>VLSM uses classless routing. It requires a routing protocol that carries the subnet mask, such as RIPv2, OSPF, EIGRP, or BGP.</p>
+        </div>
+        <div class="topic">
+          <h4>Why VLSM Matters</h4>
+          <ul>
+            <li>Reduces wasted IP addresses.</li>
+            <li>Allows efficient use of a limited address block.</li>
+            <li>Supports hierarchical addressing and summarisation.</li>
+            <li>Is essential for modern networks where IPv4 addresses are scarce.</li>
+          </ul>
+        </div>
+        <div class="topic">
+          <h4>Subnet Size Reference (IPv4)</h4>
+          <table>
+            <thead>
+              <tr><th>Prefix</th><th>Subnet Mask</th><th>Total Addresses</th><th>Usable Hosts</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>/30</td><td>255.255.255.252</td><td>4</td><td>2</td></tr>
+              <tr><td>/29</td><td>255.255.255.248</td><td>8</td><td>6</td></tr>
+              <tr><td>/28</td><td>255.255.255.240</td><td>16</td><td>14</td></tr>
+              <tr><td>/27</td><td>255.255.255.224</td><td>32</td><td>30</td></tr>
+              <tr><td>/26</td><td>255.255.255.192</td><td>64</td><td>62</td></tr>
+              <tr><td>/25</td><td>255.255.255.128</td><td>128</td><td>126</td></tr>
+              <tr><td>/24</td><td>255.255.255.0</td><td>256</td><td>254</td></tr>
+              <tr><td>/23</td><td>255.255.254.0</td><td>512</td><td>510</td></tr>
+              <tr><td>/22</td><td>255.255.252.0</td><td>1024</td><td>1022</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="topic">
+          <h4>Host Formula</h4>
+          <div class="formula">Usable hosts = 2^(host bits) minus 2
+For /24: 2^8 minus 2 = 254 usable hosts
+For /30: 2^2 minus 2 = 2 usable hosts</div>
+          <p>We subtract 2 because one address is the network address and one is the broadcast address.</p>
+        </div>
+        <div class="topic">
+          <h4>Steps to Perform VLSM</h4>
+          <ul>
+            <li>List all subnets needed with their host requirements.</li>
+            <li>Sort them from largest to smallest.</li>
+            <li>Assign the largest subnet first, using the smallest prefix that fits its hosts.</li>
+            <li>Continue with the next largest, using the next available block.</li>
+            <li>Use /30 for point to point links between routers.</li>
+            <li>Verify that no subnets overlap and all hosts are accommodated.</li>
+          </ul>
+        </div>
+        <div class="topic">
+          <h4>Worked Example</h4>
+          <p>Given the block 192.168.10.0/24, subnet it for the following:</p>
+          <ul>
+            <li>Sales: 100 hosts</li>
+            <li>IT: 50 hosts</li>
+            <li>Admin: 20 hosts</li>
+            <li>WAN link between two routers: 2 hosts</li>
+          </ul>
+          <p><strong>Step 1, sort largest to smallest:</strong> Sales 100, IT 50, Admin 20, WAN 2.</p>
+          <p><strong>Step 2, assign:</strong></p>
+          <div class="formula">Sales (100 hosts needs /25, 126 usable)
+  192.168.10.0/25      hosts 192.168.10.1 to 192.168.10.126
+  broadcast 192.168.10.127
+
+IT (50 hosts needs /26, 62 usable)
+  192.168.10.128/26    hosts 192.168.10.129 to 192.168.10.190
+  broadcast 192.168.10.191
+
+Admin (20 hosts needs /27, 30 usable)
+  192.168.10.192/27    hosts 192.168.10.193 to 192.168.10.222
+  broadcast 192.168.10.223
+
+WAN link (2 hosts needs /30, 2 usable)
+  192.168.10.224/30    hosts 192.168.10.225 and 192.168.10.226
+  broadcast 192.168.10.227</div>
+          <p>Total used: 228 addresses out of 256. The remaining 192.168.10.228/30 through 192.168.10.252 are free for future growth.</p>
+        </div>
+        <div class="topic">
+          <h4>Common VLSM Mistakes</h4>
+          <ul>
+            <li>Assigning a subnet that is too small and running out of host addresses.</li>
+            <li>Overlapping subnets because the next block was chosen incorrectly.</li>
+            <li>Using a classful protocol like RIPv1 which cannot carry the mask.</li>
+            <li>Forgetting to reserve a /30 for router to router links.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="view" id="view-quiz">
+    <div class="quiz-intro" id="quizStart">
+      <span class="inst-tag">Cre8Learn Institute</span>
+      <h2>Routing Protocols and VLSM: Quiz Bank</h2>
+      <p>40 questions covering routing fundamentals, RIP, OSPF, EIGRP, BGP, administrative distance, and VLSM. Answer at your own pace, then check your score.</p>
+      <button class="start-btn" id="startQuizBtn" type="button">Start Quiz</button>
+    </div>
+
+    <div id="quizArea" style="display:none;">
+      <div class="progress-row">
+        <span id="progressText">0 of 40 answered</span>
+        <div class="bar-outer"><div class="bar-inner" id="progressBar"></div></div>
+      </div>
+      <div id="questions"></div>
+      <div class="quiz-controls">
+        <button class="btn primary" id="checkBtn" type="button">Check Answers</button>
+        <button class="btn ghost" id="resetBtn" type="button">Reset</button>
+      </div>
+      <div class="score-banner" id="scoreBanner">
+        <div class="big" id="scoreBig">0 / 40</div>
+        <div class="msg" id="scoreMsg"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="site-footer">
+  <strong>Cre8Learn Institute</strong> &middot; Routing Protocols and VLSM &middot; Learning Portal &middot; 2025
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var tabs = document.querySelectorAll(".tab");
+  var views = document.querySelectorAll(".view");
+
+  tabs.forEach(function (tab) {
+    tab.addEventListener("click", function () {
+      tabs.forEach(function (t) { t.classList.remove("active"); });
+      views.forEach(function (v) { v.classList.remove("active"); });
+      tab.classList.add("active");
+      document.getElementById("view-" + tab.getAttribute("data-view")).classList.add("active");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  });
+
+  var headers = document.querySelectorAll(".section-header");
+  headers.forEach(function (h) {
+    h.addEventListener("click", function () {
+      var card = h.parentElement;
+      card.classList.toggle("open");
+    });
+  });
+
+  var questions = [
+    { topic: "Fundamentals", text: "At which OSI layer does routing take place?", options: ["Layer 2, Data Link", "Layer 3, Network", "Layer 4, Transport", "Layer 1, Physical"], answer: 1 },
+    { topic: "Fundamentals", text: "What is the main difference between static and dynamic routing?", options: ["Static is manual, dynamic is learned automatically", "Static is faster, dynamic is slower", "Static uses IPv6, dynamic uses IPv4", "There is no difference"], answer: 0 },
+    { topic: "Fundamentals", text: "What is an Autonomous System (AS)?", options: ["A group of networks under a single administrative control", "A single router", "A type of cable", "A protocol header"], answer: 0 },
+    { topic: "Fundamentals", text: "Which of the following is an Interior Gateway Protocol?", options: ["BGP", "EGP", "OSPF", "IDRP"], answer: 2 },
+    { topic: "Fundamentals", text: "Which of the following is an Exterior Gateway Protocol?", options: ["OSPF", "RIP", "EIGRP", "BGP"], answer: 3 },
+    { topic: "Fundamentals", text: "When multiple routes exist to the same destination, what is checked first?", options: ["Lowest metric", "Lowest administrative distance", "Longest prefix match", "Highest bandwidth"], answer: 2 },
+    { topic: "Fundamentals", text: "What is the next hop in routing?", options: ["The final destination address", "The next router the packet is forwarded to", "The source address", "The broadcast address"], answer: 1 },
+    { topic: "Fundamentals", text: "What does a routing table store?", options: ["A list of users", "A list of network destinations and next hops", "A list of open files", "A list of VLANs"], answer: 1 },
+
+    { topic: "RIP", text: "What metric does RIP use?", options: ["Cost based on bandwidth", "Hop count", "Composite metric", "Path attributes"], answer: 1 },
+    { topic: "RIP", text: "What is the maximum valid hop count in RIP?", options: ["10", "15", "16", "20"], answer: 1 },
+    { topic: "RIP", text: "In RIP, what does a hop count of 16 mean?", options: ["The route is optimal", "The route is unreachable", "The route is static", "The route is default"], answer: 1 },
+    { topic: "RIP", text: "Which version of RIP supports VLSM?", options: ["RIPv1", "RIPv2", "Both versions", "Neither version"], answer: 1 },
+    { topic: "RIP", text: "What is the default administrative distance of RIP?", options: ["90", "110", "120", "200"], answer: 2 },
+    { topic: "RIP", text: "Which algorithm does RIP use?", options: ["Dijkstra SPF", "Bellman-Ford", "DUAL", "Path vector"], answer: 1 },
+    { topic: "RIP", text: "What is the default RIP update timer?", options: ["10 seconds", "30 seconds", "60 seconds", "180 seconds"], answer: 1 },
+    { topic: "RIP", text: "Which mechanism prevents a router from advertising a route back out the interface it learned it from?", options: ["Split horizon", "Hold-down", "Triggered update", "Authentication"], answer: 0 },
+
+    { topic: "OSPF", text: "What metric does OSPF use?", options: ["Hop count", "Cost based on bandwidth", "Composite metric", "AS path"], answer: 1 },
+    { topic: "OSPF", text: "What is the default administrative distance of OSPF?", options: ["90", "110", "120", "170"], answer: 1 },
+    { topic: "OSPF", text: "Which algorithm does OSPF use to compute the shortest path?", options: ["Bellman-Ford", "Dijkstra SPF", "DUAL", "Floyd-Warshall"], answer: 1 },
+    { topic: "OSPF", text: "Which OSPF area is the backbone area?", options: ["Area 1", "Area 0", "Area 100", "Area 255"], answer: 1 },
+    { topic: "OSPF", text: "Which OSPF LSA type is generated by an Area Border Router to share routes between areas?", options: ["Type 1", "Type 2", "Type 3", "Type 5"], answer: 2 },
+    { topic: "OSPF", text: "What is the default OSPF hello timer on a broadcast network?", options: ["5 seconds", "10 seconds", "30 seconds", "40 seconds"], answer: 1 },
+    { topic: "OSPF", text: "What is the default OSPF dead timer on a broadcast network?", options: ["10 seconds", "20 seconds", "40 seconds", "180 seconds"], answer: 2 },
+    { topic: "OSPF", text: "Which router connects OSPF to another routing domain?", options: ["Internal router", "Backbone router", "Area Border Router", "Autonomous System Boundary Router"], answer: 3 },
+    { topic: "OSPF", text: "What is the OSPF cost of an interface with 100 Mbps bandwidth using the default reference bandwidth?", options: ["1", "10", "100", "1000"], answer: 0 },
+
+    { topic: "EIGRP", text: "Which company developed EIGRP?", options: ["Juniper", "Cisco", "Huawei", "Nokia"], answer: 1 },
+    { topic: "EIGRP", text: "What algorithm does EIGRP use?", options: ["Bellman-Ford", "Dijkstra SPF", "DUAL", "Path vector"], answer: 2 },
+    { topic: "EIGRP", text: "What is the default administrative distance of internal EIGRP?", options: ["90", "110", "120", "170"], answer: 0 },
+    { topic: "EIGRP", text: "What is the default administrative distance of external EIGRP?", options: ["90", "110", "120", "170"], answer: 3 },
+    { topic: "EIGRP", text: "Which command enables unequal cost load balancing in EIGRP?", options: ["variance", "metric", "k-values", "delay"], answer: 0 },
+    { topic: "EIGRP", text: "Which of these is part of the EIGRP composite metric?", options: ["Hop count", "Bandwidth and delay", "AS path", "Cost only"], answer: 1 },
+
+    { topic: "BGP", text: "What type of protocol is BGP?", options: ["Distance vector", "Link state", "Path vector", "Hybrid"], answer: 2 },
+    { topic: "BGP", text: "What is the default administrative distance of external BGP?", options: ["20", "90", "110", "200"], answer: 0 },
+    { topic: "BGP", text: "What is the default administrative distance of internal BGP?", options: ["20", "90", "110", "200"], answer: 3 },
+    { topic: "BGP", text: "How does BGP prevent routing loops?", options: ["Split horizon", "AS path check", "Hop count limit", "Hold-down timer"], answer: 1 },
+    { topic: "BGP", text: "Which TCP port does BGP use?", options: ["22", "80", "179", "443"], answer: 2 },
+    { topic: "BGP", text: "Which attribute influences inbound traffic by making a path look longer?", options: ["Local preference", "AS path prepending", "Weight", "MED"], answer: 1 },
+
+    { topic: "VLSM", text: "What does VLSM stand for?", options: ["Very Large Subnet Masking", "Variable Length Subnet Masking", "Virtual Local Subnet Management", "Verified Link State Method"], answer: 1 },
+    { topic: "VLSM", text: "Which of the following routing protocols does NOT support VLSM?", options: ["RIPv2", "OSPF", "EIGRP", "RIPv1"], answer: 3 },
+    { topic: "VLSM", text: "How many usable host addresses are in a /30 subnet?", options: ["1", "2", "4", "6"], answer: 1 },
+    { topic: "VLSM", text: "How many usable host addresses are in a /27 subnet?", options: ["14", "30", "62", "126"], answer: 1 },
+    { topic: "VLSM", text: "Given 192.168.10.0/24, which subnet is correct for a department needing 100 hosts?", options: ["/26", "/25", "/27", "/28"], answer: 1 },
+    { topic: "VLSM", text: "Why is /30 typically used for point to point links between routers?", options: ["Because it allows 254 hosts", "Because it provides exactly 2 usable addresses which is all that is needed", "Because it supports VLSM", "Because it is the default"], answer: 1 }
+  ];
+
+  var quizStart = document.getElementById("quizStart");
+  var quizArea = document.getElementById("quizArea");
+  var startBtn = document.getElementById("startQuizBtn");
+  var questionsEl = document.getElementById("questions");
+  var checkBtn = document.getElementById("checkBtn");
+  var resetBtn = document.getElementById("resetBtn");
+  var scoreBanner = document.getElementById("scoreBanner");
+  var scoreBig = document.getElementById("scoreBig");
+  var scoreMsg = document.getElementById("scoreMsg");
+  var progressText = document.getElementById("progressText");
+  var progressBar = document.getElementById("progressBar");
+
+  var selections = {};
+  var checked = false;
+
+  function buildQuiz() {
+    questionsEl.innerHTML = "";
+    selections = {};
+    checked = false;
+    scoreBanner.classList.remove("show");
+    updateProgress();
+
+    questions.forEach(function (q, qi) {
+      var card = document.createElement("div");
+      card.className = "q-card";
+
+      var meta = document.createElement("div");
+      meta.className = "meta";
+      meta.innerHTML =
+        '<span class="qnum">Question ' + (qi + 1) + "</span>" +
+        '<span class="topic-tag">' + q.topic + "</span>";
+      card.appendChild(meta);
+
+      var qtext = document.createElement("div");
+      qtext.className = "qtext";
+      qtext.textContent = q.text;
+      card.appendChild(qtext);
+
+      var opts = document.createElement("div");
+      opts.className = "q-options";
+
+      q.options.forEach(function (opt, oi) {
+        var optEl = document.createElement("div");
+        optEl.className = "q-option";
+        optEl.setAttribute("data-q", qi);
+        optEl.setAttribute("data-o", oi);
+
+        var letter = document.createElement("span");
+        letter.className = "letter";
+        letter.textContent = String.fromCharCode(65 + oi);
+
+        var textSpan = document.createElement("span");
+        textSpan.textContent = opt;
+
+        optEl.appendChild(letter);
+        optEl.appendChild(textSpan);
+
+        optEl.addEventListener("click", function () {
+          if (checked) return;
+          var prev = opts.querySelector(".selected");
+          if (prev) prev.classList.remove("selected");
+          optEl.classList.add("selected");
+          selections[qi] = oi;
+          updateProgress();
+        });
+
+        opts.appendChild(optEl);
+      });
+
+      card.appendChild(opts);
+      questionsEl.appendChild(card);
+    });
+  }
+
+  function updateProgress() {
+    var answered = Object.keys(selections).length;
+    var total = questions.length;
+    progressText.textContent = answered + " of " + total + " answered";
+    var pct = total === 0 ? 0 : (answered / total) * 100;
+    progressBar.style.width = pct + "%";
+  }
+
+  function checkAnswers() {
+    checked = true;
+    var correct = 0;
+    var cards = questionsEl.querySelectorAll(".q-card");
+
+    questions.forEach(function (q, qi) {
+      var card = cards[qi];
+      var optEls = card.querySelectorAll(".q-option");
+      var chosen = selections[qi];
+
+      optEls.forEach(function (optEl, oi) {
+        optEl.classList.remove("correct", "wrong", "selected");
+        if (oi === q.answer) {
+          optEl.classList.add("correct");
+        } else if (oi === chosen && chosen !== q.answer) {
+          optEl.classList.add("wrong");
+        }
+      });
+
+      if (chosen === q.answer) {
+        correct++;
+      }
+    });
+
+    scoreBig.textContent = correct + " / " + questions.length;
+    var pct = Math.round((correct / questions.length) * 100);
+    var msg = "";
+    if (pct >= 80) msg = "Excellent work. You have a strong grasp of routing and VLSM.";
+    else if (pct >= 60) msg = "Good effort. Review the topics you missed and try again.";
+    else if (pct >= 40) msg = "Fair. Go back to the study portal and revisit the key topics.";
+    else msg = "Keep going. Open the study portal and work through each section carefully.";
+    scoreMsg.textContent = pct + "% correct. " + msg;
+    scoreBanner.classList.add("show");
+    scoreBanner.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+
+  function resetQuiz() {
+    buildQuiz();
+    scoreBanner.classList.remove("show");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  startBtn.addEventListener("click", function () {
+    quizStart.style.display = "none";
+    quizArea.style.display = "block";
+    buildQuiz();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+
+  checkBtn.addEventListener("click", checkAnswers);
+  resetBtn.addEventListener("click", resetQuiz);
+
+})();
+</script>
+</body>
+</html>
